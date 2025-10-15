@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyCAFE"
+version = "0.1.0"
+description = "Python CUDA Accelerated Frame Extractor - GPU-accelerated video frame extraction with K-means clustering"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["video", "frame-extraction", "gpu", "cuda", "kmeans", "clustering", "dali", "cuml"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "numpy>=1.20.0",
+    "opencv-python>=4.5.0",
+    "Pillow>=8.0.0",
+    "tqdm>=4.60.0",
+    "scikit-learn>=0.24.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "cupy-cuda11x>=10.0.0",
+    "cuml-cu11>=22.0.0",
+    "nvidia-dali-cuda110>=1.20.0",
+]
+dev = [
+    "pytest>=6.0.0",
+    "pytest-cov>=2.10.0",
+    "black>=21.0",
+    "flake8>=3.9.0",
+    "mypy>=0.910",
+]
+
+[project.urls]
+Homepage = "https://github.com/Wulin-Tan/pyCAFE"
+Documentation = "https://github.com/Wulin-Tan/pyCAFE#readme"
+Repository = "https://github.com/Wulin-Tan/pyCAFE"
+Issues = "https://github.com/Wulin-Tan/pyCAFE/issues"
+
+[project.scripts]
+pyCAFE= "pyCAFE.cli:main"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
