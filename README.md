@@ -1,4 +1,3 @@
-```markdown
 # pyCAFE: Python CUDA Accelerated Frame Extractor
 
 **GPU-accelerated video frame extraction with intelligent K-means clustering for neuroscience and behavioral analysis workflows**
@@ -1195,4 +1194,3 @@ Made with ❤️ for the neuroscience community
 [🐛 Report Bug](https://github.com/Wulin-Tan/pyCAFE/issues) · [✨ Request Feature](https://github.com/Wulin-Tan/pyCAFE/issues) · [📖 Documentation](https://github.com/Wulin-Tan/pyCAFE#readme)
 
 </div>
-```
