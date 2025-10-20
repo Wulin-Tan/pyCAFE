@@ -27,16 +27,16 @@ Modern neuroscience research requires extracting representative training frames 
 
 ### Overall Performance Comparison
 
-| Video Duration | Resolution | Source | Frames Extracted | CPU Time | GPU Time | **Speedup** |
-|----------------|------------|--------|------------------|----------|----------|-------------|
-| **1 min** | 1280×720 | [Dryad](https://datadryad.org/dataset/doi:10.5061/dryad.mw6m905v3) | 50 | 29.5s | 2.0s | **14.7x** |
-| **15 min** | 640×480 | [Zenodo](https://zenodo.org/records/4629544) | 50 | 66.7s | 9.5s | **7.0x** |
-| **55 min** | 480×480 | [Harvard Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2FSAPNJG) | 50 | 144.5s | 36.7s | **3.9x** |
+| Video Duration | Resolution | Total Frames | Source | Frames Extracted | CPU Time | GPU Time | **Speedup** |
+|----------------|------------|--------------|--------|------------------|----------|----------|-------------|
+| **1 min** | 1280×720 | 1,981 | [Dryad](https://datadryad.org/dataset/doi:10.5061/dryad.mw6m905v3) | 50 | 29.5s | 2.0s | **14.7x** |
+| **15 min** | 640×480 | 27,000 | [Zenodo](https://zenodo.org/records/4629544) | 50 | 66.7s | 9.5s | **7.0x** |
+| **55 min** | 480×480 | 99,150 | [Harvard Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2FSAPNJG) | 50 | 144.5s | 36.7s | **3.9x** |
 
 ### Detailed Step-by-Step Analysis
 
 #### Test 1: Short Video (1 min)
-**File**: `2018-4-30_NP_A11_F_N_S_25.mp4` | **Resolution**: 1280×720 | **Frames**: 1,981
+**File**: `2018-4-30_NP_A11_F_N_S_25.mp4` | **Resolution**: 1280×720 | **Total Frames**: 1,981
 
 | Processing Step | CPU Time | GPU Time | **Speedup** |
 |-----------------|----------|----------|-------------|
@@ -46,7 +46,7 @@ Modern neuroscience research requires extracting representative training frames 
 | **Total Pipeline** | **29.5s** | **2.0s** | **14.7x** |
 
 #### Test 2: Medium Video (15 min)
-**File**: `95-WT-male-56-20200615.avi` | **Resolution**: 640×480 | **Frames**: 27,000
+**File**: `95-WT-male-56-20200615.avi` | **Resolution**: 640×480 | **Total Frames**: 27,000
 
 | Processing Step | CPU Time | GPU Time | **Speedup** |
 |-----------------|----------|----------|-------------|
@@ -56,7 +56,7 @@ Modern neuroscience research requires extracting representative training frames 
 | **Total Pipeline** | **66.7s** | **9.5s** | **7.0x** |
 
 #### Test 3: Long Video (55 min)
-**File**: `LL1-1_BalbcJ.mp4` | **Resolution**: 480×480 | **Frames**: 99,150
+**File**: `LL1-1_BalbcJ.mp4` | **Resolution**: 480×480 | **Total Frames**: 99,150
 
 | Processing Step | CPU Time | GPU Time | **Speedup** |
 |-----------------|----------|----------|-------------|
