@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Tan
+    given-names: Wulin
+    orcid: https://orcid.org/0000-0003-1678-1094
+  - family-names: Gao
+    given-names: Xiang
+    orcid: https://orcid.org/0000-0001-9277-1432
+title: "pyCAFE: Python CUDA Accelerated Frame Extractor"
+version: 0.1.0
+date-released: 2025-10-26
+url: "https://github.com/Wulin-Tan/pyCAFE"
+repository-code: "https://github.com/Wulin-Tan/pyCAFE"
+license: MIT
+keywords:
+  - CUDA
+  - video processing
+  - behavioral neuroscience
+  - frame extraction
+  - GPU acceleration
+  - DeepLabCut
+  - SLEAP
+  - pose estimation
