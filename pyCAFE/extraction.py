@@ -224,28 +224,37 @@ def extract_downsampled_frames_gpu(
 
 def extract_specific_frames(video_path, frame_indices, output_dir):
     """
-    Extract specific frames from video at full resolution using OpenCV
+    Extract specific frames from video at full resolution using OpenCV (DeepLabCut compatible)
     
     Args:
         video_path (str): Path to video file
         frame_indices (list): List of frame indices to extract
-        output_dir (str): Output directory for saved frames
+        output_dir (str): Output directory (should be project root for DLC structure)
     
     Returns:
         list: Paths to saved frame files
     
     Example:
-        >>> saved = extract_specific_frames("video.mp4", [10, 50, 100], "./frames")
-        >>> print(f"Saved {len(saved)} frames")
+        >>> saved = extract_specific_frames(
+        ...     "video.mp4", [10, 50, 100], 
+        ...     output_dir="/my/dlc/project"
+        ... )
+        >>> # Saves to: /my/dlc/project/labeled-data/video/img0010.png, etc.
     
     Notes:
+        - Directory structure: {output_dir}/labeled-data/{video_stem}/
+        - Uses DeepLabCut naming convention: img{frame_idx:0Nd}.png
         - Uses OpenCV for reliable random frame access
-        - Saves frames as PNG files
+        - Converts BGR to RGB before saving
         - Handles missing frames gracefully
     """
     
-    # Create output directory
-    os.makedirs(output_dir, exist_ok=True)
+    # DeepLabCut structure: {output_dir}/labeled-data/{video_stem}/
+    video_path_obj = Path(video_path)
+    video_stem = video_path_obj.stem
+    
+    output_path = Path(output_dir) / "labeled-data" / video_stem
+    output_path.mkdir(parents=True, exist_ok=True)
     
     # Open video
     cap = cv2.VideoCapture(video_path)
@@ -254,11 +263,17 @@ def extract_specific_frames(video_path, frame_indices, output_dir):
         print(f"❌ Failed to open video: {video_path}")
         return []
     
+    # Get padding (DLC style)
+    nframes = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    indexlength = int(np.ceil(np.log10(nframes))) if nframes > 0 else 6
+    
     saved_files = []
     
     print(f"Extracting {len(frame_indices)} frames at full resolution...")
+    print(f"Output: {output_path}")
+    print(f"Padding: {indexlength} digits")
     
-    for idx, frame_num in enumerate(tqdm(frame_indices, desc="Extracting frames")):
+    for frame_num in tqdm(frame_indices, desc="Extracting frames"):
         # Seek to frame
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
         
@@ -269,14 +284,20 @@ def extract_specific_frames(video_path, frame_indices, output_dir):
             print(f"⚠️  Failed to read frame {frame_num}")
             continue
         
-        # Save frame
-        output_path = os.path.join(output_dir, f"frame_{frame_num:06d}.png")
-        cv2.imwrite(output_path, frame)
-        saved_files.append(output_path)
+        # Convert BGR to RGB (for consistency with DLC)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        # Save with DLC naming: img{frame_idx:0{indexlength}d}.png
+        filename = f"img{str(frame_num).zfill(indexlength)}.png"
+        filepath = output_path / filename
+        
+        img = Image.fromarray(frame_rgb)
+        img.save(filepath)
+        saved_files.append(str(filepath))
     
     cap.release()
     
-    print(f"✅ Saved {len(saved_files)} frames to {output_dir}")
+    print(f"✅ Saved {len(saved_files)} frames to {output_path}")
     
     return saved_files
 
@@ -285,18 +306,16 @@ def extract_and_save_fullres_frames(
     video_path,
     frame_indices,
     output_dir,
-    file_prefix="frame",
     crop_box=None,
-    device_id=0
+    device_id=0,
 ):
     """
-    Extract full-resolution frames and save them
+    Extract full-resolution frames and save them (DeepLabCut compatible)
     
     Args:
         video_path (str): Path to video file
         frame_indices (list): Frame indices to extract
-        output_dir (str): Output directory
-        file_prefix (str, optional): Filename prefix. Default: "frame"
+        output_dir (str): Output directory (should be project root for DLC structure)
         crop_box (tuple, optional): Crop box as (x1, y1, x2, y2). Default: None
         device_id (int, optional): GPU device ID (unused, for API compatibility). Default: 0
     
@@ -304,29 +323,44 @@ def extract_and_save_fullres_frames(
         list: Paths to saved frame files
     
     Example:
+        >>> # DeepLabCut workflow
         >>> saved = extract_and_save_fullres_frames(
-        ...     "video.mp4", [10, 50, 100], "./frames", crop_box=(0, 0, 640, 480)
+        ...     video_path="/path/to/my_video.mp4",
+        ...     frame_indices=[10, 50, 100],
+        ...     output_dir="/path/to/my_project",  # project root
+        ...     crop_box=(0, 0, 640, 480)
         ... )
+        >>> # Saves to: /path/to/my_project/labeled-data/my_video/img0010.png, etc.
     
     Notes:
+        - Directory structure: {output_dir}/labeled-data/{video_stem}/
+        - Naming follows DeepLabCut convention: img{frame_idx:0Nd}.png
+        - Padding N based on total video frames (not extracted count)
         - Converts BGR to RGB before saving
         - Supports optional cropping
-        - Uses OpenCV for extraction (reliable random access)
     """
     
     print("\n" + "="*70)
-    print("💾 EXTRACTING & SAVING FULL RESOLUTION FRAMES")
+    print("💾 EXTRACTING & SAVING FULL RESOLUTION FRAMES (DeepLabCut Format)")
     print("="*70)
     
-    output_path = Path(output_dir)
+    # DeepLabCut structure: {output_dir}/labeled-data/{video_stem}/
+    video_path_obj = Path(video_path)
+    video_stem = video_path_obj.stem  # e.g., "my_video" from "my_video.mp4"
+    
+    output_path = Path(output_dir) / "labeled-data" / video_stem
     output_path.mkdir(parents=True, exist_ok=True)
     
     print(f"\n📁 Output: {output_path}")
     print(f"🎬 Processing {len(frame_indices)} frames...")
     
-    # Get video info for filename padding
+    # Get video info for filename padding (DLC style)
     video_info = get_video_info(video_path)
-    padding = len(str(video_info['nframes']))
+    nframes = video_info.get('nframes', 100000)  # fallback if unavailable
+    indexlength = int(np.ceil(np.log10(nframes))) if nframes > 0 else 6
+    
+    print(f"   Video total frames: {nframes}")
+    print(f"   Index padding: {indexlength} digits")
     
     saved_files = []
     
@@ -338,7 +372,7 @@ def extract_and_save_fullres_frames(
     
     print("\n📹 Extracting frames at full resolution...")
     
-    for frame_idx in tqdm(frame_indices, desc="Extracting & saving"):
+    for frame_idx in tqdm(frame_indices, desc="Extracting & saving", ncols=80):
         # Seek to frame
         cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
         
@@ -354,9 +388,9 @@ def extract_and_save_fullres_frames(
                 x1, y1, x2, y2 = crop_box
                 frame_rgb = frame_rgb[y1:y2, x1:x2, :]
             
-            # Save immediately (minimizes memory usage)
+            # Save with DLC naming: img{frame_idx:0{indexlength}d}.png
             img = Image.fromarray(frame_rgb)
-            filename = f"{file_prefix}_{str(frame_idx).zfill(padding)}.png"
+            filename = f"img{str(frame_idx).zfill(indexlength)}.png"
             filepath = output_path / filename
             img.save(filepath)
             
@@ -368,5 +402,7 @@ def extract_and_save_fullres_frames(
     
     print(f"\n✅ Saved {len(saved_files)}/{len(frame_indices)} frames")
     print(f"📁 Location: {output_path}")
+    if saved_files:
+        print(f"📝 Example: {Path(saved_files[0]).name}")
     
     return saved_files
