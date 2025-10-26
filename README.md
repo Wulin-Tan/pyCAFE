@@ -511,6 +511,15 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
+## 🧪 Testing
+Run the test suite:
+
+```bash
+# Using unittest (built-in)
+python tests/test_basic.py
+```
+---
+
 <div align="center">
 
 **⭐ Star this repo if pyCAFE helps your research! ⭐**
